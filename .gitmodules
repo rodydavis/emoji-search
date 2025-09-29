@@ -1,0 +1,6 @@
+[submodule "third_party/sqlite-vec"]
+	path = third_party/sqlite-vec
+	url = https://github.com/asg017/sqlite-vec
+[submodule "third_party/emsdk"]
+	path = third_party/emsdk
+	url = https://github.com/emscripten-core/emsdk

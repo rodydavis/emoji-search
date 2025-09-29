@@ -1,0 +1,27 @@
+@import url('reset.css');
+
+body {
+    width: 100%;
+    display: grid;
+    grid-template-areas:
+        "search"
+        "suggestions";
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+}
+
+#search {
+    grid-area: search;
+    margin: 8px;
+    padding: 8px;
+    border-radius: 8px;
+}
+
+#suggestions {
+    grid-area: suggestions;
+    padding: 0 8px;
+
+    progress {
+        width: 100%;
+    }
+}
