@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "@huggingface/transformers": "^3.7.3",
-    "@sqlite.org/sqlite-wasm": "^3.50.4-build1"
+    "@sqlite.org/sqlite-wasm": "^3.50.4-build1",
+    "firebase": "^12.3.0"
   }
 }

@@ -10,11 +10,25 @@ body {
     grid-template-rows: auto 1fr;
 }
 
-#search {
+header {
     grid-area: search;
-    margin: 8px;
-    padding: 8px;
-    border-radius: 8px;
+    display: flex;
+    flex-direction: row;
+
+    #search {
+        flex: 1;
+        margin: 8px;
+        padding: 8px;
+        border-radius: 8px;
+    }
+
+    .actions {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 8px;
+        margin-right: 8px;
+    }
 }
 
 #suggestions {
@@ -24,4 +38,13 @@ body {
     progress {
         width: 100%;
     }
+}
+
+button {
+    border: none;
+    background: none;
+    border: 1px solid grey;
+    border-radius: 8px;
+    padding: 4px;
+    height: 40px;
 }

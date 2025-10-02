@@ -1,17 +1,24 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>emoji-search</title>
-  </head>
-  <body>
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>emoji-search</title>
+</head>
+
+<body>
+  <header>
     <input id="search" placeholder="Search" type="search" disabled>
-    <div id="suggestions">
-      <progress></progress>
+    <div class="actions">
+      <button id="update">Update</button>
+      <button id="download">Download</button>
     </div>
-    <datalist id="emojis"></datalist>
-    <script type="module" src="/src/main.ts"></script>
-  </body>
+  </header>
+  <div id="suggestions"></div>
+  <datalist id="emojis"></datalist>
+  <script type="module" src="/src/main.ts"></script>
+</body>
+
 </html>
