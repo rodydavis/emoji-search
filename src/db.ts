@@ -32,32 +32,41 @@ export function insertEmoji(emoji: EmojiResult, embedding?: Float32Array) {
             .stepReset();
         e = db.selectObject("SELECT * FROM emojis WHERE name = ?", [emoji.emoji])!;
     }
-   if (embedding) {
-       insertStmt
-           .bind(1, e.id)
-           .bind(2, embedding.buffer)
-           .stepReset();
-   }
+    if (embedding) {
+        insertStmt
+            .bind(1, e.id)
+            .bind(2, embedding.buffer)
+            .stepReset();
+    }
     return e.id as number;
 }
 
-export function queryEmojis(embedding: Float32Array, limit = 8) {
-    const rows = db
-        .selectArrays(
-        `
-        SELECT
-            emoji_id,
-            emojis.name,
-            emojis.description,
-            distance
-        FROM emojis_embeddings
-        LEFT JOIN emojis
-            ON emojis.id = emojis_embeddings.emoji_id
-        WHERE embedding MATCH ?
-        AND k = ${limit}
-        ORDER BY distance
-        `, embedding.buffer
-        );
+const simpleVectorQuery = `
+SELECT
+    emoji_id,
+    emojis.name,
+    emojis.description,
+    distance
+FROM emojis_embeddings
+LEFT JOIN emojis
+    ON emojis.id = emojis_embeddings.emoji_id
+WHERE embedding MATCH ?
+AND k = 3
+ORDER BY distance
+`;
+
+const simpleQuery = `
+SELECT
+    emoji_id,
+    emojis.name,
+    emojis.description
+FROM emojis
+WHERE description LIKE ?
+`;
+
+export function queryEmojis(query: string, embedding: Float32Array) {
+    const rows = db.selectArrays(simpleVectorQuery, embedding.buffer);
+    // const rows = db.selectArrays(simpleQuery, `%${query}%`);
     return rows.map(e => ({
         id: e[0],
         emoji: e[1],
@@ -74,8 +83,8 @@ export function getEmojiCounts() {
     `);
     if (!e) {
         return ({
-            emojis: 0, 
-            emojiVectors: 0, 
+            emojis: 0,
+            emojiVectors: 0,
         });
     }
     return ({

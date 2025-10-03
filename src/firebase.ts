@@ -8,7 +8,6 @@ const app = initializeApp({
 const db = getFirestore(app);
 connectFirestoreEmulator(db, '127.0.0.1', 3131);
 
-
 const emojisRef = collection(db, 'emojis');
 
 export async function addEmoji(emoji: EmojiResult, embedding?: Float32Array) {

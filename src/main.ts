@@ -1,15 +1,15 @@
 import './css/style.css'
-import { getAllEmojis, type EmojiResult } from './emojis.ts';
 import { embeddingGemma, encodeDocuments, encodeQuery, getEmbedder } from './ai.ts';
-import { createBatches, sleep } from "./utils.ts";
 import { insertEmoji, queryEmojis } from "./db.ts";
-import { addEmoji, getEmoji, getEmojis } from './firebase.ts';
+import { addEmoji, getEmojis } from './firebase.ts';
+import { getAllEmojis } from './emojis.ts';
+import { createBatches, sleep } from './utils.ts';
 
 const search = document.querySelector('#search') as HTMLInputElement;
 const suggestions = document.querySelector('#suggestions')!;
-const emojis = document.querySelector('#emojis')!;
-const update = document.querySelector('#update')!;
 const download = document.querySelector('#download')!;
+// const emojis = document.querySelector('#emojis')!;
+const update = document.querySelector('#update')!;
 
 const embedder = await getEmbedder(embeddingGemma);
 
@@ -17,18 +17,29 @@ update.addEventListener('click', () => updateEmojis());
 download.addEventListener('click', () => downloadEmojis());
 
 async function downloadEmojis() {
+  let p = suggestions.querySelector('progress') as HTMLProgressElement | null;
+  if (!p) {
+    p = document.createElement('progress');
+    p.id = 'progress';
+    suggestions.append(p);
+  }
   const emojisRemote = await getEmojis();
-  for (const e of emojisRemote) {
+  for (let i = 0; i < emojisRemote.length; i++) {
+    const e = emojisRemote[i];
+    console.log('emoji', e.emoji, e?.embedding?.length)
     if (e.embedding) {
       insertEmoji(e, new Float32Array(e.embedding))
     } else {
       insertEmoji(e)
     }
+    p.value = (i + 1) / emojisRemote.length;
+    await sleep(50);
   }
 
   if (emojisRemote.length > 0) {
     search.removeAttribute('disabled');
   }
+  p.remove();
 }
 
 async function updateEmojis() {
@@ -42,24 +53,29 @@ async function updateEmojis() {
   console.log('fetching emojis..');
   const emojisResults = await getAllEmojis();
   console.log('emojis: ', emojisResults.length);
-  const missingEmojis: EmojiResult[] = [];
+  // const missingEmojis: EmojiResult[] = [];
 
-  for (let i = 0; i < emojisResults.length; i++) {
-    const emoji = emojisResults[i];
-    const option = document.createElement('option');
-    option.value = emoji.emoji;
-    option.label = emoji.description;
-    emojis.append(option);
-    p.value = (i + 1) / emojisResults.length;
-    const r = await getEmoji(emoji.emoji);
-    console.log('checking emoji', emoji.emoji, r?.embedding?.length);
-    if (r) continue;
-    missingEmojis.push(emoji);
-  }
+  // for (let i = 0; i < emojisResults.length; i++) {
+  //   const emoji = emojisResults[i];
+  //   const option = document.createElement('option');
+  //   option.value = emoji.emoji;
+  //   option.label = emoji.description;
+  //   emojis.append(option);
+  //   p.value = (i + 1) / emojisResults.length;
+  //   const r = await getEmoji(emoji.emoji);
+  //   console.log('checking emoji', emoji.emoji, r?.embedding?.length);
+  //   if (r) continue;
+  //   missingEmojis.push(emoji);
+  //   const result = await encodeDocument(embedder, emoji.description);
+  //   const e = new Float32Array(result)
+  //   await addEmoji(emoji, e);
+  //   // insertEmoji(emoji, e)
+  //   p.value = (i + 1) / emojisResults.length;
+  // }
 
   p.value = 0;
-  console.log('embedding emojis..', missingEmojis.length);
-  const target = createBatches(missingEmojis, 25);
+  console.log('embedding emojis..', emojisResults.length);
+  const target = createBatches(emojisResults, 25);
   for (let i = 0; i < target.length; i++) {
     const batch = target[i];
     const results = await encodeDocuments(embedder, batch.map(e => e.description));
@@ -87,7 +103,7 @@ search.addEventListener('change', async () => {
   }
 
   const res = await encodeQuery(embedder, value);
-  const results = queryEmojis(new Float32Array(res));
+  const results = queryEmojis(value, new Float32Array(res));
   const list = document.createElement('ul');
 
   for (const val of results) {

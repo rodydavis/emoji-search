@@ -88,19 +88,19 @@ export interface EmojiResult {
     code_points?: string[];
 }
 
-function getFileUrls(version: string) {
+function getFileUrls(version: string, local = true) {
     const baseUrl = 'https://www.unicode.org/Public/emoji';
     let prefix = `${baseUrl}/${version}`;
-    prefix = new URL('../third_party/unicode', import.meta.url).toString();
+    if (local) prefix = new URL('../third_party/unicode', import.meta.url).toString();
     return [
         `${prefix}/emoji-sequences.txt`,
         `${prefix}/emoji-zwj-sequences.txt`,
     ];
 }
 
-export async function getAllEmojis(version = 'latest'): Promise<Array<EmojiResult>> {
+export async function getAllEmojis(version = 'latest', local = true): Promise<Array<EmojiResult>> {
     const results: EmojiResult[] = [];
-    for (const url of getFileUrls(version)) {
+    for (const url of getFileUrls(version, local)) {
         const res = await fetch(url);
         if (res.status === 200) {
             const body = await res.text();
