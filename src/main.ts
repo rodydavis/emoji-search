@@ -103,7 +103,7 @@ search.addEventListener('change', async () => {
   }
 
   const res = await encodeQuery(embedder, value);
-  const results = queryEmojis(value, new Float32Array(res));
+  const results = queryEmojis(new Float32Array(res));
   const list = document.createElement('ul');
 
   for (const val of results) {

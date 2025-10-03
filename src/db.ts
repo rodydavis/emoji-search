@@ -55,18 +55,8 @@ AND k = 3
 ORDER BY distance
 `;
 
-const simpleQuery = `
-SELECT
-    emoji_id,
-    emojis.name,
-    emojis.description
-FROM emojis
-WHERE description LIKE ?
-`;
-
-export function queryEmojis(query: string, embedding: Float32Array) {
+export function queryEmojis(embedding: Float32Array) {
     const rows = db.selectArrays(simpleVectorQuery, embedding.buffer);
-    // const rows = db.selectArrays(simpleQuery, `%${query}%`);
     return rows.map(e => ({
         id: e[0],
         emoji: e[1],
